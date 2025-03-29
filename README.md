@@ -70,6 +70,8 @@ Edit the `config.py` file to include your API keys for the engines you want to u
 
 - Fallback: Decide if invalid moves should fallback to a random legal move or forfeit.
 
+- Toggle whether to include a list of legal moves in the prompt. (Increase accuracy, but potentially increase token usage.)
+
 - Choose a speed on the sidebar (x1 = normal, x2/x3/x4 = faster).
 
 - Click Start Game.
