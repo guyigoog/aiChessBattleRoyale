@@ -100,7 +100,7 @@ def render_main_ui():
     # Include a list valid moves in prompt
     include_valid_moves = st.toggle(
         "Include list of current legal moves in prompt to improve accuracy?",
-        value=False,
+        value=True,
         help="When enabled, "
              "this option sends the current list of legal moves along with the board state to the model. "
              "This extra context can lead to more accurate move suggestions. "
