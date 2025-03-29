@@ -41,7 +41,7 @@ def override_api_keys_if_provided(user_keys):
     """
     # If user typed an OpenAI key, override openai.api_key.
     if user_keys["openai"]:
-        openai.api_key = user_keys["openai"]
+        ai_wrappers.standard_client.set_api_key(user_keys["openai"])
 
     # For Claude (Anthropic) API, we can set the client directly.
     if user_keys["claude"]:
@@ -49,7 +49,7 @@ def override_api_keys_if_provided(user_keys):
 
     # For DeepSeek, we can store it in session_state so our ai_wrappers uses it.
     if user_keys["deepseek"]:
-        st.session_state["override_deepseek"] = user_keys["deepseek"]
+        ai_wrappers.deepseek_client.set_api_key(user_keys["deepseek"])
 
     # For Gemini (Google), we can set the client directly.
     if user_keys["gemini"]:
