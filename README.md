@@ -44,10 +44,13 @@ each with selectable sub-models (e.g. GPT‑4 vs GPT‑3.5). Features include:
    ```
 5. **Set up** your AI API key:
 Edit the `config.py` file to include your API keys for the engines you want to use.
-- For OpenAI, set the `OPENAI_API_KEY` environment variable.
-- For Claude, set the `CLAUDE_API_KEY` environment variable.
-- For DeepSeek, set the `DEEPEEK_API_KEY` environment variable and set the `DEEPEEK_API_URL` environment variable.
-- For Gemini, set the `GEMINI_API_KEY` environment variable.
+- **For Local runs:** set the `USE_STREAMLIT_SECRETS` variable to `False`.
+  - For OpenAI, set the `OPENAI_API_KEY` environment variable.
+  - For Claude, set the `CLAUDE_API_KEY` environment variable.
+  - For DeepSeek, set the `DEEPEEK_API_KEY` environment variable and set the `DEEPEEK_API_URL` environment variable.
+  - For Gemini, set the `GEMINI_API_KEY` environment variable.
+- **For Streamlit Cloud:** set the `USE_STREAMLIT_SECRETS` variable to `True` and add your API keys in the Streamlit secrets management.
+- **Optionally,** you can override these keys at runtime via the UI.
 6. **Run** the app:
    ```bash
    streamlit run main.py
@@ -62,6 +65,8 @@ Edit the `config.py` file to include your API keys for the engines you want to u
 - Select the Black Engine and sub-model.
 
 - Optionally enable Time Control and specify minutes/inc.
+
+- Optionally override the API keys for each engine to use your own keys, from the UI.
 
 - Fallback: Decide if invalid moves should fallback to a random legal move or forfeit.
 
@@ -78,11 +83,14 @@ You can download the PGN file of the game for later analysis.
 .
 ├── main.py           # Main application file
 ├── config.py         # API keys and config constants
+├── openai_client.py  # OpenAIClient class with context manager and API key setter for multi-client support
 ├── ai_wrappers.py    # Engine-specific 'get_move' functions
 ├── move_logic.py     # 'safe_get_move' logic and invalid-move handling
 ├── ui.py             # Streamlit UI components
 ├── logger_setup.py   # Logging configuration
 ├── requirements.txt  # Python dependencies
+├── .gitignore        # Git ignore file
+├── LICENSE           # MIT License file
 └── README.md         # This file
 ```
 
