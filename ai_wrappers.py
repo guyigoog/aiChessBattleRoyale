@@ -1,9 +1,8 @@
 import chess
-import openai
-import requests
 from google import genai
 import anthropic
 import streamlit as st
+from openai_client import OpenAIClient
 from config import (
     USE_STREAMLIT_SECRETS,
     OPENAI_API_KEY,
@@ -14,10 +13,13 @@ from config import (
 )
 
 # Initialize clients
-openai.api_key = st.secrets["OPENAI_API_KEY"] if USE_STREAMLIT_SECRETS else OPENAI_API_KEY
+standard_client = OpenAIClient(api_key=st.secrets["OPENAI_API_KEY"] if USE_STREAMLIT_SECRETS else OPENAI_API_KEY)
 genai_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"] if USE_STREAMLIT_SECRETS else GEMINI_API_KEY)
 claude_client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"] if USE_STREAMLIT_SECRETS else CLAUDE_API_KEY)
-deepseek_client_api_key = st.secrets["DEEPSEEK_API_KEY"] if USE_STREAMLIT_SECRETS else DEEPSEEK_API_KEY
+deepseek_client = OpenAIClient(
+    api_key=st.secrets["DEEPSEEK_API_KEY"] if USE_STREAMLIT_SECRETS else DEEPSEEK_API_KEY,
+    api_base=DEEPSEEK_API_URL
+)
 
 
 def get_openai_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
@@ -43,30 +45,20 @@ def get_openai_move(board: chess.Board, sub_model: str, excluded_moves=None, deb
     prompt = (
         f"You are a chess engine. It is {color_str}'s turn.\n"
         f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
+        f"Do not return any explanations or additional text.\n"
         f"{exclusion_text}"
     )
 
     debug_log(f"[OpenAI/{sub_model}] Prompt:\n{prompt}")
 
-    try:
-        resp = openai.chat.completions.create(
-            model=sub_model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0
-        )
-        raw = resp.choices[0].message.content.strip()
-        debug_log(f"[OpenAI/{sub_model}] Raw Response: {raw}")
-        return raw
-    except AttributeError:
-        # Fallback for older openai library versions
-        resp = openai.ChatCompletion.create(
-            model=sub_model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0
-        )
-        raw = resp.choices[0].message.content.strip()
-        debug_log(f"[OpenAI/{sub_model} - fallback] Raw: {raw}")
-        return raw
+    resp = standard_client.chat_completion(
+        model=sub_model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0
+    )
+    raw = resp.choices[0].message.content.strip()
+    debug_log(f"[OpenAI/{sub_model}] Raw Response: {raw}")
+    return raw
 
 
 def get_claude_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
@@ -92,6 +84,7 @@ def get_claude_move(board: chess.Board, sub_model: str, excluded_moves=None, deb
     prompt = (
         f"You are a chess engine. It is {color_str}'s turn.\n"
         f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
+        f"Do not return any explanations or additional text.\n"
         f"{exclusion_text}"
     )
 
@@ -130,39 +123,23 @@ def get_deepseek_move(board: chess.Board, sub_model: str, excluded_moves=None, d
             "Do not return any of those moves, and do not return any illegal moves.\n"
         )
 
-    override_key = st.session_state.get("override_deepseek", "")
-    if override_key:
-        api_key_to_use = override_key
-    else:
-        api_key_to_use = deepseek_client_api_key
-
     prompt = (
         f"You are a chess engine. It is {color_str}'s turn.\n"
         f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
+        f"Do not return any explanations or additional text.\n"
         f"{exclusion_text}"
     )
 
     debug_log(f"[DeepSeek/{sub_model}] Prompt:\n{prompt}")
 
-    try:
-        resp = requests.post(
-            url=DEEPSEEK_API_URL,
-            json={
-                "model": sub_model,  # sub_model might be "deepseek-chat"
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0
-            },
-            headers={"Authorization": f"Bearer {api_key_to_use}"},
-            timeout=5
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        raw = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-        debug_log(f"[DeepSeek/{sub_model}] Raw: {raw}")
-        return raw
-    except Exception as e:
-        st.error(f"DeepSeek error: {e}")
-        return ""
+    resp = deepseek_client.chat_completion(
+        model=sub_model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0
+    )
+    raw = resp.choices[0].message.content.strip()
+    debug_log(f"[DeepSeek/{sub_model}] Raw Response: {raw}")
+    return raw
 
 
 def get_gemini_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
@@ -188,6 +165,7 @@ def get_gemini_move(board: chess.Board, sub_model: str, excluded_moves=None, deb
     prompt = (
         f"You are a chess engine. It is {color_str}'s turn.\n"
         f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
+        f"Do not return any explanations or additional text.\n"
         f"{exclusion_text}"
     )
 
