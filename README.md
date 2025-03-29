@@ -100,7 +100,9 @@ You can download the PGN file of the game for later analysis.
 [Try it out here!](https://aichessbattle.streamlit.app)
 > [!NOTE]
 > Please use with  your own API keys, as the demo is rate-limited and may not work for everyone.
+
 > The demo is hosted on Streamlit Cloud and may be slow or unavailable at times.
+
 > If you want to run it locally, please follow the setup instructions above.
 
 ## Contributing
