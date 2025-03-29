@@ -70,6 +70,8 @@ Edit the `config.py` file to include your API keys for the engines you want to u
 
 - Fallback: Decide if invalid moves should fallback to a random legal move or forfeit.
 
+- Toggle whether to include a list of legal moves in the prompt. (Increase accuracy, but potentially increase token usage.)
+
 - Choose a speed on the sidebar (x1 = normal, x2/x3/x4 = faster).
 
 - Click Start Game.
@@ -93,6 +95,13 @@ You can download the PGN file of the game for later analysis.
 ├── LICENSE           # MIT License file
 └── README.md         # This file
 ```
+
+## Demo
+[Try it out here!](https://aichessbattle.streamlit.app)
+> [!NOTE]
+> Please use with  your own API keys, as the demo is rate-limited and may not work for everyone.
+> The demo is hosted on Streamlit Cloud and may be slow or unavailable at times.
+> If you want to run it locally, please follow the setup instructions above.
 
 ## Contributing
 Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request.

@@ -11,7 +11,8 @@ def safe_get_move(
         turn: str,
         max_retries=3,
         random_fallback=True,
-        debug_log=lambda m: None
+        debug_log=lambda m: None,
+        include_valid_moves=False
 ) -> Optional[chess.Move]:
     """
     Attempt to get a valid/legal move from the engine_func up to max_retries times.
@@ -24,12 +25,18 @@ def safe_get_move(
     :param max_retries: maximum number of attempts to get a valid move.
     :param random_fallback: whether to fallback to a random legal move if all attempts fail.
     :param debug_log: function to log debug messages.
+    :param include_valid_moves: whether to include a list of valid moves in the prompt.
     :return: a valid chess.Move object or None if no valid move is found.
     """
     excluded_moves = []
 
     for attempt in range(max_retries):
-        raw_move = engine_func(board, sub_model, excluded_moves=excluded_moves, debug_log=debug_log).strip()
+        raw_move = engine_func(board,
+                               sub_model,
+                               excluded_moves=excluded_moves,
+                               debug_log=debug_log,
+                               include_valid_moves=include_valid_moves
+                               ).strip()
         debug_log(f"{turn.title()} raw attempt #{attempt + 1} [model={sub_model}]: {raw_move}")
 
         # Try parse UCI

@@ -134,6 +134,8 @@ if start_button_clicked:
             sub_model = black_sub_model
 
         start_time = time.time()
+
+        include_valid_moves = user_params["include_valid_moves"]
         move = safe_get_move(
             board=board,
             engine_func=engine_func,
@@ -141,7 +143,8 @@ if start_button_clicked:
             turn=turn,
             max_retries=3,
             random_fallback=random_fallback,
-            debug_log=debug_log
+            debug_log=debug_log,
+            include_valid_moves=include_valid_moves
         )
 
         # If no move => forfeit
