@@ -5,6 +5,7 @@ from google import genai
 import anthropic
 import streamlit as st
 from config import (
+    USE_STREAMLIT_SECRETS,
     OPENAI_API_KEY,
     CLAUDE_API_KEY,
     DEEPSEEK_API_URL,
@@ -13,10 +14,10 @@ from config import (
 )
 
 # Initialize clients
-openai.api_key = OPENAI_API_KEY
-genai_client = genai.Client(api_key=GEMINI_API_KEY)
-claude_client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
-
+openai.api_key = st.secrets["OPENAI_API_KEY"] if USE_STREAMLIT_SECRETS else OPENAI_API_KEY
+genai_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"] if USE_STREAMLIT_SECRETS else GEMINI_API_KEY)
+claude_client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"] if USE_STREAMLIT_SECRETS else CLAUDE_API_KEY)
+deepseek_client_api_key = st.secrets["DEEPSEEK_API_KEY"] if USE_STREAMLIT_SECRETS else DEEPSEEK_API_KEY
 
 def get_openai_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
     """
@@ -144,7 +145,7 @@ def get_deepseek_move(board: chess.Board, sub_model: str, excluded_moves=None, d
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0
             },
-            headers={"Authorization": f"Bearer {DEEPSEEK_API_KEY}"},
+            headers={"Authorization": f"Bearer {deepseek_client_api_key}"},
             timeout=5
         )
         resp.raise_for_status()
