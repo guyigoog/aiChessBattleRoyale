@@ -5,14 +5,17 @@ ENGINE_MODELS = {
     "OpenAI": [
         "gpt-4o-mini",
         "gpt-3.5-turbo",
-        "gpt-4o", "o3-mini",
-        "o1-mini"
+        "gpt-4o",
+        # "o3-mini", # Currently not available for my tier at the openai API
+        # "o1-mini" # Currently not available for my tier at the openai API
     ],
     "Claude": [
-        "claude-3-5-haiku-20241022",
-        "claude-3-haiku-20240307",
-        "claude-3-7-sonnet-20250219",
-        "claude-3-opus-20240229"
+        "claude-3-5-haiku-latest",
+        "claude-3-haiku-latest",
+        "claude-3-7-sonnet-latest",
+        "claude-3-5-sonnet-latest",
+        "claude-3-opus-latest",
+        "claude-2.1"
     ],
     "DeepSeek": [
         "deepseek-chat",
@@ -56,7 +59,7 @@ def render_sidebar():
 
 def render_main_ui():
     """
-    Renders the main UI area (title, engine selects, time controls, fallback checkbox).
+    Renders the main UI area (title, engine selects, time controls, fallback toggle, include valid moves toggle).
     Returns all selected user parameters in a dictionary.
     :return: dict of main UI parameters based on user input
     """

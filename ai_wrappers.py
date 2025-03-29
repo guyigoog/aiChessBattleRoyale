@@ -66,7 +66,7 @@ def get_claude_move(board: chess.Board, sub_model: str, excluded_moves=None, deb
 
     response = claude_client.messages.create(
         model=sub_model,
-        max_tokens=32,
+        max_tokens=360,
         messages=[{"role": "user", "content": prompt}],
     )
     content = response.content
