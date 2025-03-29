@@ -4,10 +4,14 @@ import chess.pgn
 import chess.svg
 import time
 import logging
+import openai
+import anthropic
+from google import genai
 from datetime import datetime
 
+import ai_wrappers
 from logger import setup_logging
-from ui import render_sidebar, render_main_ui
+from ui import render_sidebar, render_main_ui, render_api_key_inputs
 from ai_wrappers import ENGINE_FUNCTIONS
 from move_logic import safe_get_move
 
@@ -22,6 +26,34 @@ setup_logging(filename='game_log.pgn')
 
 # ========== Render the Sidebar UI first ==========
 debug_mode, speedup_choice = render_sidebar()
+
+# ========== Check for user-provided keys ==========
+user_keys = render_api_key_inputs()
+
+
+# ========== API Key Handling ==========
+def override_api_keys_if_provided(user_keys):
+    """
+    If the user typed a custom key, override the global or st.secrets-based keys.
+    Otherwise, fallback to config or st.secrets (whatever ai_wrappers is currently using).
+    :param user_keys: Dictionary of user-provided keys
+    :return: None
+    """
+    # If user typed an OpenAI key, override openai.api_key.
+    if user_keys["openai"]:
+        openai.api_key = user_keys["openai"]
+
+    # For Claude (Anthropic) API, we can set the client directly.
+    if user_keys["claude"]:
+        ai_wrappers.claude_client = anthropic.Anthropic(api_key=user_keys["claude"])
+
+    # For DeepSeek, we can store it in session_state so our ai_wrappers uses it.
+    if user_keys["deepseek"]:
+        st.session_state["override_deepseek"] = user_keys["deepseek"]
+
+    # For Gemini (Google), we can set the client directly.
+    if user_keys["gemini"]:
+        ai_wrappers.genai_client = genai.Client(api_key=user_keys["gemini"])
 
 
 def debug_log(msg: str):
@@ -60,6 +92,9 @@ if 'move_log' not in st.session_state:
 
 # ======== If Start Game is clicked ========
 if start_button_clicked:
+    # Override API keys if provided
+    override_api_keys_if_provided(user_keys)
+    # Set up engines
     board = chess.Board()
     game = chess.pgn.Game()
     game.headers.update({

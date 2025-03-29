@@ -108,3 +108,41 @@ def render_main_ui():
         "random_fallback": random_fallback,
         "start_button_clicked": start_button_clicked
     }
+
+
+def render_api_key_inputs():
+    """
+    Renders text inputs in the sidebar for optional user-provided API keys.
+    Returns a dict with the user-provided keys, which may be empty strings if none entered.
+    :return: dict of API keys
+    """
+    user_keys = {"openai": "", "claude": "", "deepseek": "", "gemini": ""}
+
+    with st.sidebar.expander("Provide Your Own API Keys (Optional)", expanded=False):
+        user_keys["openai"] = st.text_input(
+            "OpenAI API Key",
+            value="",
+            type="password",
+            help="If left blank, fallback to config.py or st.secrets."
+        )
+        user_keys["claude"] = st.text_input(
+            "Claude API Key",
+            value="",
+            type="password",
+            help="If left blank, fallback to config.py or st.secrets."
+        )
+        user_keys["deepseek"] = st.text_input(
+            "DeepSeek API Key",
+            value="",
+            type="password",
+            help="If left blank, fallback to config.py or st.secrets."
+        )
+        user_keys["gemini"] = st.text_input(
+            "Gemini API Key",
+            value="",
+            type="password",
+            help="If left blank, fallback to config.py or st.secrets."
+        )
+
+    user_keys = {k: v.strip() for k, v in user_keys.items()}
+    return user_keys
