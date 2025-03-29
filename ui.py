@@ -90,9 +90,18 @@ def render_main_ui():
         increment = 0
 
     # Fallback or forfeit
-    random_fallback = st.checkbox(
+    random_fallback = st.toggle(
         "Fallback to random move if engine can't produce a valid move?",
         value=True
+    )
+    # Include a list valid moves in prompt
+    include_valid_moves = st.toggle(
+        "Include list of current legal moves in prompt to improve accuracy?",
+        value=False,
+        help="When enabled, "
+             "this option sends the current list of legal moves along with the board state to the model."
+             "This extra context can lead to more accurate move suggestions,"
+             "potentially decrease API calls, but will increase token usage."
     )
 
     start_button_clicked = st.button('Start Game')
@@ -106,6 +115,7 @@ def render_main_ui():
         "minutes": minutes,
         "increment": increment,
         "random_fallback": random_fallback,
+        "include_valid_moves": include_valid_moves,
         "start_button_clicked": start_button_clicked
     }
 

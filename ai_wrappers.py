@@ -22,32 +22,19 @@ deepseek_client = OpenAIClient(
 )
 
 
-def get_openai_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
+def get_openai_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None,
+                    include_valid_moves=False) -> str:
     """
     Get a move from OpenAI's API based on the current board state and excluded moves.
     :param board:  chess.Board object representing the current game state.
     :param sub_model:  The specific OpenAI model to use (e.g., "gpt-4o-mini").
     :param excluded_moves:  List of moves that are invalid or previously attempted.
     :param debug_log:  Function to log debug messages.
+    :param include_valid_moves:  Whether to include a list of valid moves in the prompt.
     :return:  The best move in UCI format as a string.
     """
-    if excluded_moves is None:
-        excluded_moves = []
-    color_str = "White" if board.turn == chess.WHITE else "Black"
 
-    exclusion_text = ""
-    if excluded_moves:
-        exclusion_text = (
-            f"Invalid or previously attempted moves that are NOT allowed:\n{excluded_moves}\n"
-            "Do not return any of those moves, and do not return any illegal moves.\n"
-        )
-
-    prompt = (
-        f"You are a chess engine. It is {color_str}'s turn.\n"
-        f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
-        f"Do not return any explanations or additional text.\n"
-        f"{exclusion_text}"
-    )
+    prompt = build_chess_prompt(board, excluded_moves=excluded_moves, include_valid_moves=include_valid_moves)
 
     debug_log(f"[OpenAI/{sub_model}] Prompt:\n{prompt}")
 
@@ -61,32 +48,19 @@ def get_openai_move(board: chess.Board, sub_model: str, excluded_moves=None, deb
     return raw
 
 
-def get_claude_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
+def get_claude_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None,
+                    include_valid_moves=False) -> str:
     """
     Get a move from Claude's API based on the current board state and excluded moves.
     :param board:  chess.Board object representing the current game state.
     :param sub_model:  The specific Claude model to use (e.g., "claude-3-5-haiku-20241022").
     :param excluded_moves:  List of moves that are invalid or previously attempted.
     :param debug_log:  Function to log debug messages.
+    :param include_valid_moves:  Whether to include a list of valid moves in the prompt.
     :return:  The best move in UCI format as a string.
     """
-    if excluded_moves is None:
-        excluded_moves = []
-    color_str = "White" if board.turn == chess.WHITE else "Black"
 
-    exclusion_text = ""
-    if excluded_moves:
-        exclusion_text = (
-            f"Invalid or previously attempted moves that are NOT allowed:\n{excluded_moves}\n"
-            "Do not return any of those moves, and do not return any illegal moves.\n"
-        )
-
-    prompt = (
-        f"You are a chess engine. It is {color_str}'s turn.\n"
-        f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
-        f"Do not return any explanations or additional text.\n"
-        f"{exclusion_text}"
-    )
+    prompt = build_chess_prompt(board, excluded_moves=excluded_moves, include_valid_moves=include_valid_moves)
 
     debug_log(f"[Claude/{sub_model}] Prompt:\n{prompt}")
 
@@ -103,32 +77,19 @@ def get_claude_move(board: chess.Board, sub_model: str, excluded_moves=None, deb
     return raw
 
 
-def get_deepseek_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
+def get_deepseek_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None,
+                      include_valid_moves=False) -> str:
     """
     Get a move from DeepSeek's API based on the current board state and excluded moves.
     :param board:  chess.Board object representing the current game state.
     :param sub_model:  The specific DeepSeek model to use (e.g., "deepseek-chat").
     :param excluded_moves:  List of moves that are invalid or previously attempted.
     :param debug_log:  Function to log debug messages.
+    :param include_valid_moves:  Whether to include a list of valid moves in the prompt.
     :return:  The best move in UCI format as a string.
     """
-    if excluded_moves is None:
-        excluded_moves = []
-    color_str = "White" if board.turn == chess.WHITE else "Black"
 
-    exclusion_text = ""
-    if excluded_moves:
-        exclusion_text = (
-            f"Invalid or previously attempted moves that are NOT allowed:\n{excluded_moves}\n"
-            "Do not return any of those moves, and do not return any illegal moves.\n"
-        )
-
-    prompt = (
-        f"You are a chess engine. It is {color_str}'s turn.\n"
-        f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
-        f"Do not return any explanations or additional text.\n"
-        f"{exclusion_text}"
-    )
+    prompt = build_chess_prompt(board, excluded_moves=excluded_moves, include_valid_moves=include_valid_moves)
 
     debug_log(f"[DeepSeek/{sub_model}] Prompt:\n{prompt}")
 
@@ -142,32 +103,19 @@ def get_deepseek_move(board: chess.Board, sub_model: str, excluded_moves=None, d
     return raw
 
 
-def get_gemini_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
+def get_gemini_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None,
+                    include_valid_moves=False) -> str:
     """
     Get a move from Gemini's API based on the current board state and excluded moves.
     :param board:  chess.Board object representing the current game state.
     :param sub_model:  The specific Gemini model to use (e.g., "gemini-2.0-flash").
     :param excluded_moves:  List of moves that are invalid or previously attempted.
     :param debug_log:  Function to log debug messages.
+    :param include_valid_moves:  Whether to include a list of valid moves in the prompt.
     :return:  The best move in UCI format as a string.
     """
-    if excluded_moves is None:
-        excluded_moves = []
-    color_str = "White" if board.turn == chess.WHITE else "Black"
 
-    exclusion_text = ""
-    if excluded_moves:
-        exclusion_text = (
-            f"Invalid or previously attempted moves that are NOT allowed:\n{excluded_moves}\n"
-            "Do not return any of those moves, and do not return any illegal moves.\n"
-        )
-
-    prompt = (
-        f"You are a chess engine. It is {color_str}'s turn.\n"
-        f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
-        f"Do not return any explanations or additional text.\n"
-        f"{exclusion_text}"
-    )
+    prompt = build_chess_prompt(board, excluded_moves=excluded_moves, include_valid_moves=include_valid_moves)
 
     debug_log(f"[Gemini/{sub_model}] Prompt:\n{prompt}")
 
@@ -175,6 +123,51 @@ def get_gemini_move(board: chess.Board, sub_model: str, excluded_moves=None, deb
     raw = response.text.strip()
     debug_log(f"[Gemini/{sub_model}] Raw: {raw}")
     return raw
+
+
+def build_chess_prompt(
+        board: chess.Board,
+        excluded_moves: object = None,
+        include_valid_moves: bool = False
+) -> str:
+    """
+    Constructs a prompt for move generation based on the current board state,
+    excluded moves, and optionally includes the list of legal moves.
+
+    :param board: The current chess.Board object.
+    :param excluded_moves: List of moves to exclude from the suggestion.
+    :param include_valid_moves: Whether to append a list of legal moves to the prompt.
+    :return: The constructed prompt string.
+    """
+    if excluded_moves is None:
+        excluded_moves = []
+    color_str = "White" if board.turn == chess.WHITE else "Black"
+
+    exclusion_text = ""
+    valid_moves_str = ""
+    if excluded_moves:
+        exclusion_text = (
+            f"Invalid or previously attempted moves that are NOT allowed:\n{excluded_moves}\n"
+            "Do not return any of those moves, and do not return any illegal moves.\n"
+        )
+
+    if include_valid_moves:
+        # Append legal moves to the prompt
+        legal_moves = ", ".join(move.uci() for move in board.legal_moves)
+        valid_moves_str = (
+            f"Here is a list of legal moves: {legal_moves}\n"
+            "Please choose one of these moves.\n"
+        )
+
+    current_move_prompt = (
+        f"You are a chess engine. It is {color_str}'s turn.\n"
+        f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
+        f"{valid_moves_str}"
+        "Do not return any explanations or additional text.\n"
+        f"{exclusion_text}"
+    )
+
+    return current_move_prompt
 
 
 ENGINE_FUNCTIONS = {
