@@ -19,6 +19,7 @@ genai_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"] if USE_STREAMLI
 claude_client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"] if USE_STREAMLIT_SECRETS else CLAUDE_API_KEY)
 deepseek_client_api_key = st.secrets["DEEPSEEK_API_KEY"] if USE_STREAMLIT_SECRETS else DEEPSEEK_API_KEY
 
+
 def get_openai_move(board: chess.Board, sub_model: str, excluded_moves=None, debug_log=lambda m: None) -> str:
     """
     Get a move from OpenAI's API based on the current board state and excluded moves.
@@ -129,6 +130,12 @@ def get_deepseek_move(board: chess.Board, sub_model: str, excluded_moves=None, d
             "Do not return any of those moves, and do not return any illegal moves.\n"
         )
 
+    override_key = st.session_state.get("override_deepseek", "")
+    if override_key:
+        api_key_to_use = override_key
+    else:
+        api_key_to_use = deepseek_client_api_key
+
     prompt = (
         f"You are a chess engine. It is {color_str}'s turn.\n"
         f"Given this FEN: {board.fen()}, return a legal best move in UCI format only.\n"
@@ -145,7 +152,7 @@ def get_deepseek_move(board: chess.Board, sub_model: str, excluded_moves=None, d
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0
             },
-            headers={"Authorization": f"Bearer {deepseek_client_api_key}"},
+            headers={"Authorization": f"Bearer {api_key_to_use}"},
             timeout=5
         )
         resp.raise_for_status()
